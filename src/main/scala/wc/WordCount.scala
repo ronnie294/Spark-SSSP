@@ -26,6 +26,12 @@ object WordCountMain {
     val rawD = textFile.map(word => (word.split(",")(0),(1.0,word.split(",")(1)))).
       filter(s=>(Integer.valueOf(s._1)<=threshold)&&(if (s._2._2.equals("S")) {true} else Integer.valueOf(s._2._2)<=threshold))
 
+    val graph=rawD.groupByKey().mapValues(_.toList)
+    graph.persist()
+
+    var distances = graph.mapValues(s=> if (s.contains((1.0,"S"))) 0.0 else Double.PositiveInfinity)
+    val accum=sc.doubleAccumulator
+
 
 
   }
