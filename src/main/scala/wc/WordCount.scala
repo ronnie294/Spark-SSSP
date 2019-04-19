@@ -36,6 +36,12 @@ object WordCountMain {
 
   }
 
+  def helper(values:List[(Double,String)],distance:Double,id:String) :List[(String,Double)] ={
+    val list= values.map(s=>(s._2,s._1+distance))
+    val toReturn =(id,distance)::list
+    toReturn
+  }
+
 
 
 }
