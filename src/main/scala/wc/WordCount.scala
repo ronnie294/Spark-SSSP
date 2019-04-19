@@ -15,6 +15,18 @@ object WordCountMain {
       System.exit(1)
     }
 
+    val conf = new SparkConf().setAppName("Word Count")
+    val sc = new SparkContext(conf)
+
+
+    val threshold=20000
+
+
+    val textFile = sc.textFile(args(0))
+    val rawD = textFile.map(word => (word.split(",")(0),(1.0,word.split(",")(1)))).
+      filter(s=>(Integer.valueOf(s._1)<=threshold)&&(if (s._2._2.equals("S")) {true} else Integer.valueOf(s._2._2)<=threshold))
+
+
 
   }
 
