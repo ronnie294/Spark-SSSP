@@ -32,6 +32,22 @@ object WordCountMain {
     var distances = graph.mapValues(s=> if (s.contains((1.0,"S"))) 0.0 else Double.PositiveInfinity)
     val accum=sc.doubleAccumulator
 
+    while (accum.isZero ){
+      val temp=distances.collect()
+      logger.info("Ronit")
+      logger.info(accum.value)
+      distances = graph.join(distances).flatMap(s=>helper(s._2._1,s._2._2,s._1)).reduceByKey((x,y)=>min(x,y))
+      /* var diff = temp.subtractByKey(distances)
+       if (diff.count()>=1){
+         accum.add(1.0)
+       }*/
+
+      if (distances.collect() sameElements temp){
+        accum.add(1.0)
+      }
+    }
+    distances.saveAsTextFile(args(1))
+
 
 
   }
