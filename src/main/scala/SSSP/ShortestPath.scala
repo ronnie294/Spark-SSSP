@@ -1,9 +1,8 @@
 package SSSP
 
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
 import org.apache.log4j.LogManager
-import org.apache.log4j.Level
+import org.apache.spark.{SparkConf, SparkContext}
+
 import scala.math.min
 
 object ShortestPath {
@@ -15,16 +14,21 @@ object ShortestPath {
       System.exit(1)
     }
 
-    val conf = new SparkConf().setAppName("Word Count")
+    val conf = new SparkConf().setAppName("SSSP")
     val sc = new SparkContext(conf)
 
-
-    val threshold=20000
-
+/*
+Threshold to test for various cases
+ */
+    val threshold=11316811
 
     val textFile = sc.textFile(args(0))
     val rawD = textFile.map(word => (word.split(",")(0),(1.0,word.split(",")(1)))).
       filter(s=>(Integer.valueOf(s._1)<=threshold)&&(if (s._2._2.equals("S")) {true} else Integer.valueOf(s._2._2)<=threshold))
+
+/*
+Construction and persisting of graph
+ */
 
     val graph=rawD.groupByKey().mapValues(_.toList)
     graph.persist()
@@ -32,17 +36,17 @@ object ShortestPath {
     var distances = graph.mapValues(s=> if (s.contains((1.0,"S"))) 0.0 else Double.PositiveInfinity)
     val accum=sc.doubleAccumulator
 
+   /*
+   Accumulator is used to detect convergence
+    */
     while (accum.isZero ){
-      val temp=distances.collect()
-      logger.info("Ronit")
-      logger.info(accum.value)
+      val temp=distances
       distances = graph.join(distances).flatMap(s=>helper(s._2._1,s._2._2,s._1)).reduceByKey((x,y)=>min(x,y))
-      /* var diff = temp.subtractByKey(distances)
-       if (diff.count()>=1){
-         accum.add(1.0)
-       }*/
 
-      if (distances.collect() sameElements temp){
+      var count = temp.subtract(distances).count()
+      logger.info(count+"Ronit")
+
+      if (count==0){
         accum.add(1.0)
       }
     }
@@ -57,6 +61,8 @@ object ShortestPath {
     val toReturn =(id,distance)::list
     toReturn
   }
+
+
 
 
 

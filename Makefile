@@ -17,12 +17,12 @@ hdfs.input=input
 hdfs.output=output
 # AWS EMR Execution
 aws.emr.release=emr-5.17.0
-aws.bucket.name=ronnie294-project-2
+aws.bucket.name=ronnie294-project-3
 aws.input=input
 aws.output=output
 aws.log.dir=log
-aws.num.nodes=4
-aws.instance.type=m3.xlarge
+aws.num.nodes=9
+aws.instance.type=m4.xlarge
 # -----------------------------------------------------------
 
 # Compiles code and builds jar (with dependencies).
